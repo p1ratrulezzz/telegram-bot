@@ -77,7 +77,12 @@ class Application {
     //   });
     // }
 
-    let pContinue = Promise.resolve(app);
+    let pContinue = bot.telegram.getMe().then((botInfo) => {
+      bot.options.username = botInfo.username;
+
+      return app;
+    });
+
     getFilesInDir('./src/processors/commands').forEach((value) => {
       pContinue = pContinue.then((app) => {
         return self.addCommand(value);

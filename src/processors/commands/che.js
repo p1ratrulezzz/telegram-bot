@@ -64,7 +64,8 @@ function register({app, bot}) {
 module.exports = {
   enabled: true,
   command: COMMAND,
-  description: 'Start command',
-  help: 'Are you so stupid to ask?',
+  description: 'Выдает случайный пост с паблика "че" https://vk.com/21jqofa. Если не задан второй параметр,' +
+  ' по умолчанию ищет среди самых новых записей (новее).',
+  help:         '/che [-п строка_поиска] [-н индекс_начала_поиска] [-к количество_элементов] [новее|новое|старое|старейшее]',
   register
 }
