@@ -38,11 +38,18 @@ class Application {
   }
 
   addCommand (command) {
+    let self = this;
+    let pResult = Promise.resolve(this);
     if (command.enabled === true) {
       command.command = command.command || command.name;
-      command.register({app, bot: this.bot});
-      this.commands[command.command] = command;
+      pResult = command.register({app, bot: this.bot}).then((app) => {
+        self.commands[command.command] = command;
+
+        return app;
+      });
     }
+
+    return pResult;
   }
 
   addTextProcessor(processor) {
@@ -70,19 +77,31 @@ class Application {
     //   });
     // }
 
+    let pContinue = Promise.resolve(app);
     getFilesInDir('./src/processors/commands').forEach((value) => {
-      this.addCommand(value);
+      pContinue = pContinue.then((app) => {
+        return self.addCommand(value);
+      });
     });
 
-    bot.on('text', (ctx) => {
-      let pContinue = Promise.resolve(ctx);
-      this.processors.text.forEach((processor) => {
-        pContinue = pContinue.then((context) => {
-          return processor.process(ctx);
+    pContinue.then((app) => {
+      // Add text processors.
+      bot.on('text', (ctx) => {
+        let pContinue = Promise.resolve(ctx);
+        this.processors.text.forEach((processor) => {
+          pContinue = pContinue.then((context) => {
+            return processor.process(ctx);
+          });
         });
-      });
 
-      return pContinue;
+        return pContinue;
+      });
+    });
+
+    return pContinue.then((app) => {
+      bot.startPolling();
+
+      return app;
     });
 
     // bot.command('gc', ({ from, reply, message }) => {
@@ -99,7 +118,7 @@ class Application {
     //   });
     // });
 
-    bot.startPolling();
+
   }
 
   stop() {
@@ -112,7 +131,14 @@ class Application {
 }
 
 let app = new Application();
-app.start();
+app
+.start()
+.then((app) => {
+  app.logger.info('Application started');
+})
+.catch((err) => {
+  logger.log(err);
+});
 
 
 /**

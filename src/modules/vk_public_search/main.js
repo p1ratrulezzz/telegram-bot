@@ -8,15 +8,6 @@ const yargs = require('yargs');
 const random = require('../random/main').randomAsync;
 
 /**
- * Local constants
- * @private
- */
-const PUBLIC_INFO_DEFAULT = {
-   //id: -123, // id has priority
-   domain: '21jqofa'
-};
-
-/**
  *
  * @param argText
  * @param VK
@@ -48,7 +39,7 @@ function parseCommand (argText, VK, publicInfo) {
 
   let bText = argText.substr(bArgs._ !== undefined ? argText.indexOf(bArgs._[0]) : 0);
   // Fallback to newest
-  let subset = String(bText).length == 0 ? 'newest' : bText;
+  let subset = String(bText).length === 0 ? 'newest' : bText;
 
   // Check if subset correctly chosen
   if (!subsets[subset]) {
@@ -146,6 +137,7 @@ function parseCommand (argText, VK, publicInfo) {
         }
 
         let attachments = [];
+        let attachmentsRaw = [];
         if (itemsMethod == 'wall.get') {
           let count = attachmentsCount; // > response.count ? response.count : attachmentsCount;
           for (let cnt = 0; cnt < count; cnt++) {
@@ -163,6 +155,7 @@ function parseCommand (argText, VK, publicInfo) {
             if (post !== undefined && post.excluded !== true) {
               post.excluded = true; // Exclude from being selected again as maximum
               attachments.push('wall' + post.owner_id + '_' + post.id);
+              attachmentsRaw.push(post);
             }
           }
         }
@@ -170,11 +163,13 @@ function parseCommand (argText, VK, publicInfo) {
           for (let i = 0; i < response.items.length; i++) {
             let post = response.items[i];
             attachments.push('wall' + post.owner_id + '_' + post.id);
+            attachmentsRaw.push(post);
           }
         }
 
         return {
-          attachments: attachments.join(',')
+          attachments: attachments,
+          attachments_raw: attachmentsRaw
         };
       });
     });

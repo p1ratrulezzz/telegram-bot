@@ -84,7 +84,7 @@ function register({app, bot}) {
     }
   });
 
-  return app;
+  return Promise.resolve(app);
   // Handle message update
   bot.on('text', (ctx) =>  {
 

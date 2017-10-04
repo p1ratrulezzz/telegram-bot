@@ -13,6 +13,8 @@ function register({app, bot}) {
   bot.command('/' + COMMAND, ({reply}) => {
     return reply(random(0, 512));
   });
+
+  return Promise.resolve(app);
 }
 
 module.exports = {

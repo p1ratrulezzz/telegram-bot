@@ -11,6 +11,8 @@ function register({app, bot}) {
   bot.command(COMMAND, ({reply}) => {
     return reply('Hello. And fuck you.');
   });
+
+  return Promise.resolve(app);
 }
 
 module.exports = {
